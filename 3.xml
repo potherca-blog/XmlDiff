@@ -1,11 +1,11 @@
 <xml>
+    <een>
+        <a></a>
+        <b></b>
+    </een>
     <twee>
+        <c></c>
         <d></d>
         <e></e>
-        <c></c>
     </twee>
-    <een>
-        <b></b>
-        <a></a>
-    </een>
 </xml>
