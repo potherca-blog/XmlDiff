@@ -91,10 +91,11 @@ function getContent(array $p_aUploadedFiles, $p_sDisplayType = 'side-by-side'){
                 } elseif ($p_aUploadedFiles['left']['size'] === 0 OR $p_aUploadedFiles['right']['size'] === 0) {
                     $sContent = '<p class="warning">One (or both) of the uploaded files did not contain any content</p>';
                 } else {
-		            require __DIR__ . '/class.XmlSorter.php';
-		            require __DIR__ . '/vendor/phpspec/php-diff/lib/Diff.php';
-		            require __DIR__ . '/vendor/phpspec/php-diff/lib/Diff/Renderer/Html/SideBySide.php';
-		            require __DIR__ . '/vendor/phpspec/php-diff/lib/Diff/Renderer/Html/Inline.php';
+                    $sRootPath = __DIR__ . '/../'; 
+		            require $sRootPath . '/class.XmlSorter.php';
+		            require $sRootPath . '/vendor/phpspec/php-diff/lib/Diff.php';
+		            require $sRootPath . '/vendor/phpspec/php-diff/lib/Diff/Renderer/Html/SideBySide.php';
+		            require $sRootPath . '/vendor/phpspec/php-diff/lib/Diff/Renderer/Html/Inline.php';
 
                     $sLeftXml = XmlSorter::forFile($p_aUploadedFiles['left']['tmp_name']);
                     $sRightXml = XmlSorter::forFile($p_aUploadedFiles['right']['tmp_name']);
