@@ -10,6 +10,23 @@
 <head>
     <title>Compare two XML files</title>
 	<link rel="stylesheet" href="styles.css" />
+	<style>
+	    .warning { 
+	        border: 1px solid red;
+	        position: absolute;
+	        padding: 0.35em;
+	        border-radius: 0.15em;
+	        color: darkred;
+	    }
+	    .warning::before {
+	        content: "WARNING: "; 
+	        background-color: darkred;
+	        color: white;
+	        padding: 0.35em;
+	        left: -0.5em;
+	        position: relative;
+	    }
+	</style>
 </head>
 <body>
     <!-- -->
@@ -71,6 +88,8 @@ function getContent(array $p_aUploadedFiles, $p_sDisplayType = 'side-by-side'){
                         . 'Right: ' . $aErrors[$_FILES['right']['error']]
                         . '</p>'
                     ;
+                } elseif ($p_aUploadedFiles['left']['size'] === 0 OR $p_aUploadedFiles['right']['size'] === 0) {
+                    $sContent = '<p class="warning">One (or both) of the uploaded files did not contain any content</p>';
                 } else {
 		            require __DIR__ . '/class.XmlSorter.php';
 		            require __DIR__ . '/vendor/phpspec/php-diff/lib/Diff.php';
