@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Controller for the web frontend.
+ * 
+ * 
+ */
 class XmlDiff
 {
     public function compare($p_sOne, $p_sTwo)
