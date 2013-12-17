@@ -53,10 +53,15 @@ class XmlSorter
         foreach($p_aSubject as $t_sKey => $t_mValue) {
             //$t_sKey = (is_numeric($t_sKey) ? 'item':'') . $t_sKey; // Uncomment if you need to fix numeric keys in the array
             if(is_array($t_mValue)) {
-                $oSubNode = $p_oXml->addChild($t_sKey);
-                $this->arrayToXmlRecursive($t_mValue, $oSubNode);
-            }
-            else {
+                if($t_sKey === '@attributes'){
+                    foreach($t_mValue as $t_sAttributeName => $t_sAttributeValue) {
+                        $p_oXml->addAttribute($t_sAttributeName, $t_sAttributeValue);
+                    }
+                } else {
+                    $oSubNode = $p_oXml->addChild($t_sKey);
+                    $this->arrayToXmlRecursive($t_mValue, $oSubNode);
+                }
+            } else {
                 $p_oXml->addChild($t_sKey, $t_mValue);
             }
         }
