@@ -1,0 +1,14 @@
+<xml>
+    <een>
+        <a>
+            Some content
+        </a>
+        <b>
+            Some more content
+        </b>
+    </een>
+    <twee>
+        <c an-attribute="another value"></c>
+        <d/>
+    </twee>
+</xml>
