@@ -11,11 +11,14 @@
     <title>Compare two XML files</title>
 	<link rel="stylesheet" href="styles.css" />
 	<style>
-	    .warning { 
-	        border: 1px solid red;
+	    .match, .warning { 
+	        border: 1px solid;
 	        position: absolute;
 	        padding: 0.35em;
 	        border-radius: 0.15em;
+	    }
+	    .warning { 
+	        border-color: red;
 	        color: darkred;
 	    }
 	    .warning::before {
@@ -26,6 +29,11 @@
 	        left: -0.5em;
 	        position: relative;
 	    }
+	    .match {
+	        border-color: lime;
+	        background-color: darkgreen;
+	        color: white;
+	    } 
 	</style>
 </head>
 <body>
@@ -123,7 +131,9 @@ function getContent(array $p_aUploadedFiles, $p_sDisplayType = 'side-by-side'){
                     }
 
 		            $sContent = $oDiff->render($oRenderer);
-
+                    if ($sContent === '') {
+                        $sContent = '<p class="match">Files are identical</p>';
+                    }
                 }
             }
         }
