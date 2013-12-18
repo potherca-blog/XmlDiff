@@ -54,6 +54,7 @@ class XmlSorter
             //$t_sKey = (is_numeric($t_sKey) ? 'item':'') . $t_sKey; // Uncomment if you need to fix numeric keys in the array
             if(is_array($t_mValue)) {
                 if($t_sKey === '@attributes'){
+                ksort($t_mValue);
                     foreach($t_mValue as $t_sAttributeName => $t_sAttributeValue) {
                         $p_oXml->addAttribute($t_sAttributeName, $t_sAttributeValue);
                     }
