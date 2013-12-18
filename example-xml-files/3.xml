@@ -8,7 +8,7 @@
         </b>
     </een>
     <twee>
-        <c an-attribute="a different value"></c>
+        <c an-attribute="a different value" second-attribute="a value also" first-attribute="a value"></c>
         <d/>
         <e></e>
     </twee>

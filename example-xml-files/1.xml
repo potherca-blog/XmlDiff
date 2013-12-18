@@ -8,7 +8,7 @@
         </b>
     </een>
     <twee>
-        <c an-attribute="a value"></c>
+        <c first-attribute="a value" second-attribute="a value also"></c>
         <d/>
     </twee>
 </xml>
