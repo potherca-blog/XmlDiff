@@ -41,13 +41,12 @@ function runComposer() {
     echo "-----> Installing Composer dependencies"
     COMPOSER_URL="http://getcomposer.org/composer.phar"
     curl --silent --max-time 60 --location "$COMPOSER_URL" > www/composer.phar
-    composer.phar install --prefer-source
+    www/composer.phar install --prefer-source
 }
 # ------------------------------------------------------------------------------
   
 # ------------------------------------------------------------------------------
 function runCleanup() {
-    runComposer
     echo '=====> Running Boot Script'
     runComposer
     cleanupAfterPhpBuildpack

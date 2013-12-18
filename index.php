@@ -98,7 +98,7 @@ function getContent(array $p_aUploadedFiles, $p_sDisplayType = 'side-by-side'){
                 } elseif ($p_aUploadedFiles['left']['size'] === 0 OR $p_aUploadedFiles['right']['size'] === 0) {
                     $sContent = '<p class="warning">One (or both) of the uploaded files did not contain any content</p>';
                 } else {
-                    $sRootPath = __DIR__ . '/../'; 
+                    $sRootPath = '/app'; 
 		            require $sRootPath . '/lib/class.XmlSorter.php';
 		            require $sRootPath . '/vendor/phpspec/php-diff/lib/Diff.php';
 		            require $sRootPath . '/vendor/phpspec/php-diff/lib/Diff/Renderer/Html/SideBySide.php';
