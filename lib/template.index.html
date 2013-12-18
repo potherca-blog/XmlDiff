@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Compare two XML files</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        .match, .warning {
+            border: 1px solid;
+            padding: 0.35em;
+            border-radius: 0.15em;
+        }
+        .warning {
+            border-color: red;
+            color: darkred;
+        }
+        .warning::before {
+            content: "WARNING: ";
+            background-color: darkred;
+            color: white;
+            padding: 0.35em;
+            left: -0.5em;
+            position: relative;
+        }
+        .match {
+            border-color: lime;
+            background-color: darkgreen;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<!-- -->
+<form action="" method="post" enctype="multipart/form-data">
+    <p>XML Files to compare:</p>
+    <p>
+        <label>
+            Old:
+            <input name="left" type="file" />
+        </label>
+        <label>
+            New:
+            <input name="right" type="file" />
+        </label>
+    </p>
+    <p>
+        Display Diff
+        <label>
+            <input type="radio" name="display-mode" value="side-by-side" /> Side-by-side
+        </label>
+        <label>
+            <input type="radio" name="display-mode" value="inline" /> Inline
+        </label>
+    </p>
+    <p>
+        <input type="submit" value="Send files" />
+    </p>
+</form>
+<!-- -->
+<div id="content"></div>
+</body>
+</html>
