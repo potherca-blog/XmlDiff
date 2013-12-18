@@ -1,5 +1,10 @@
-<!DOCTYPE html>
-<?php
+<?php 
+if (strpos($_SERVER['REQUEST_URI'],'styles.css') !== false) {
+   header('Content-Type: text/css');
+   readfile('styles.css');
+   die;
+}
+?><!DOCTYPE html><?php
     if (isset($_POST['display-mode'])) {
         $sContent = getContent($_FILES, $_POST['display-mode']);
     } else {

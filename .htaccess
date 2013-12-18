@@ -3,12 +3,12 @@ RewriteEngine On
 RewriteRule ^\.htaccess$ - [F]
 
 RewriteCond %{REQUEST_URI} =""
-RewriteRule ^.*$ /webroot/index.php [NC,L]
+RewriteRule ^.*$ web/index.php [NC,L]
 
-RewriteCond %{REQUEST_URI} !^/webroot/.*$
-RewriteRule ^(.*)$ /webroot/$1
+RewriteCond %{REQUEST_URI} !^/web/.*$
+RewriteRule ^(.*)$ web/$1
 
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^.*$ - [NC,L]
 
-RewriteRule ^public/.*$ /webroot/index.php [NC,L]
+RewriteRule ^web/.*$ web/index.php [NC,L]
