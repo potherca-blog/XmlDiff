@@ -55,10 +55,12 @@ class XmlSorter
 
     protected function arrayToXml(array $p_aSubject)
     {
-        $p_oXml = new SimpleXMLElement('<?xml version="1.0"?><root></root>');
+        $sRoot = array_keys($p_aSubject);
+        $sRoot = $sRoot[0];
+        //@FIXME: Get name of original root node and use that instead of "root"
+        $p_oXml = new SimpleXMLElement('<?xml version="1.0"?><' . $sRoot . '></' . $sRoot . '>');
         $oXml = $this->arrayToXmlRecursive($p_aSubject, $p_oXml);
 
-        //@TODO: Get rid of ROOT node
         return $oXml->asXml();
     }
 
@@ -94,11 +96,11 @@ class XmlSorter
 
     protected function xmlToArray($p_sXml)
     {
-        $xml = simplexml_load_string($p_sXml);
-        $json = json_encode($xml);
-        $array = json_decode($json, true);
+        $oXml = simplexml_load_string($p_sXml);
+        $oJson = '{"' . $oXml->getName() . '" : ' . json_encode($oXml) .'}';
+        $aXML = json_decode($oJson, true);
 
-        return $array;
+        return $aXML;
     }
 
     protected function arraySortByKeysRecursive($p_aSubject)
