@@ -109,7 +109,7 @@ class Controller
             //'context' => 999,
             'ignoreNewLines' => true,
             'ignoreWhitespace' => true,
-            'ignoreCase' => false
+            'ignoreCase' => true
         );
 
         // Initialize the diff class
