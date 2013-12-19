@@ -30,9 +30,8 @@ function cleanupAfterPhpBuildpack() {
     # Make sure any 'hidden' files also get moved
     shopt -s dotglob
 
-    keep lib
-    keep .git
-    keep vendor
+    mv /app/www/* /app
+    mv /app/web/* /app/www
 }
 # ------------------------------------------------------------------------------
 
