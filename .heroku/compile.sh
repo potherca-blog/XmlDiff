@@ -2,7 +2,7 @@
 
 # fail fast
 set -e
-    echo "=====> Running Script ${0}"
+    echo "=====> Running Compile Script - ${0}"
 
 # figure out where we are top level of the code lies
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"

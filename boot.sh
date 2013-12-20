@@ -10,7 +10,7 @@
 # ==============================================================================
 # FUNCTIONS
 # ==============================================================================
-function keep() {
+function keep(){
     echo "----->     Attempt to move ${1}"
     if [ -f "www/${1}" ]; then
       mv -v --target-directory="${HOME}/" "www/${1}"
@@ -24,7 +24,7 @@ function keep() {
 
 
 # ------------------------------------------------------------------------------
-function cleanupAfterPhpBuildpack() {
+function cleanupAfterPhpBuildpack(){
     echo '-----> Cleaning up after PHP buildpack'
 
     # Make sure any 'hidden' files also get moved
@@ -53,7 +53,7 @@ function runCleanup() {
 }
 # ==============================================================================
 
-echo "=====> Running Script ${0}"
+echo "=====> Running Boot Script - ${0}"
 runCleanup
 
 #EOF
