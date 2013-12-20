@@ -6,6 +6,22 @@ class XmlSorter
     protected $m_sOriginalXml;
 
     /**
+     * @return mixed
+     */
+    public function getXml()
+    {
+        return $this->m_sOriginalXml;
+    }
+
+    /**
+     * @param mixed $p_sXml
+     */
+    public function setXml($p_sXml)
+    {
+        $this->m_sOriginalXml = (string) $p_sXml;
+    }
+
+    /**
      * @return array
      */
     public function getErrors()
@@ -20,117 +36,36 @@ class XmlSorter
         } else {
             $sXml = file_get_contents($p_sXmlPath);
             $oSorter = new self($sXml);
+            $oSorter->setXml($sXml);
 
             return $oSorter;
         }
     }
 
-    public function __construct($p_sXml)
+    public function __construct($p_sXml='')
     {
         $this->m_sOriginalXml = $p_sXml;
     }
 
-    public function formatXml($p_sXml)
+    public function sortXml($p_sXml='')
     {
-        $mResult = false;
-
-        $oDocument = $this->loadXml($p_sXml);
-
-        if ($oDocument instanceof DOMDocument) {
-            $mResult = $oDocument->saveXML();
+        if (empty($p_sXml)) {
+            $sXml = $this->getXml();
+        } else {
+            $sXml = $p_sXml;
         }
 
-        return $mResult;
-    }
+        $oDocument = $this->xmlStringToDomDocument($sXml);
 
-    public function sortXml()
-    {
-        $sXml = $this->m_sOriginalXml;
-        $aSortedXml = $this->xmlStringToSortedArray($sXml);
-        $sXml = $this->arrayToXml($aSortedXml);
-        $sFormatXml = $this->formatXml($sXml);
-
-        return $sFormatXml;
-    }
-
-    protected function arrayToXml(array $p_aSubject)
-    {
-        $sRoot = array_keys($p_aSubject);
-        $sRoot = $sRoot[0];
-        //@FIXME: Get name of original root node and use that instead of "root"
-        $p_oXml = new SimpleXMLElement('<?xml version="1.0"?><' . $sRoot . '></' . $sRoot . '>');
-        $oXml = $this->arrayToXmlRecursive($p_aSubject, $p_oXml);
-
-        return $oXml->asXml();
-    }
-
-    /**
-     * @url http://pastebin.com/pYuXQWee
-     * @see http://stackoverflow.com/a/5965940/153049
-     */
-    protected function arrayToXmlRecursive($p_aSubject, SimpleXMLElement $p_oXml)
-    {
-        foreach ($p_aSubject as $t_sKey => $t_mValue) {
-            // @FIXME: There's a bug here with attributes set on nodes with no content
-            $t_sKey = (is_numeric($t_sKey) ? 'item':'') . $t_sKey; // Uncomment if you need to fix numeric keys in the array
-            if (is_array($t_mValue)) {
-                if ($t_sKey === '@attributes') {
-                    ksort($t_mValue);
-                    foreach ($t_mValue as $t_sAttributeName => $t_sAttributeValue) {
-                        $p_oXml->addAttribute(
-                            $t_sAttributeName,
-                            $t_sAttributeValue
-                        );
-                    }
-                } else {
-                    $oSubNode = $p_oXml->addChild($t_sKey);
-                    $this->arrayToXmlRecursive($t_mValue, $oSubNode);
-                }
-            } else {
-                $p_oXml->addChild($t_sKey, $t_mValue);
-            }
-        }
-
-        return $p_oXml;
-    }
-
-    protected function xmlToArray($p_sXml)
-    {
-        $oXml = simplexml_load_string($p_sXml);
-        $oJson = '{"' . $oXml->getName() . '" : ' . json_encode($oXml) .'}';
-        $aXML = json_decode($oJson, true);
-
-        return $aXML;
-    }
-
-    protected function arraySortByKeysRecursive($p_aSubject)
-    {
-        ksort($p_aSubject);
-        foreach ($p_aSubject as $t_sKey => $t_mValue) {
-            if (is_array($t_mValue)) {
-                $p_aSubject[$t_sKey] = $this->arraySortByKeysRecursive(
-                    $t_mValue
-                );
-            }
-        }
-
-        return $p_aSubject;
-    }
-
-    protected function xmlStringToSortedArray($p_sXmlString)
-    {
-        $aXml = $this->xmlToArray($p_sXmlString);
-        $aXml = $this->arraySortByKeysRecursive($aXml);
-
-        return $aXml;
+        return DomDocumentSorter::sort($oDocument)->saveXML();
     }
 
     /**
      * @param $sXml
      *
-     * @return array
+     * @return DOMDocument
      */
-    protected function loadXml($sXml)
+    protected function xmlStringToDomDocument($sXml)
     {
         $oDocument = new DOMDocument('1.0');
         $oDocument->preserveWhiteSpace = false;
