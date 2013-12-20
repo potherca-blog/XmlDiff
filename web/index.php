@@ -1,7 +1,7 @@
 <?php
 ob_start();
 
-$sRootPath = __DIR__;
+$sRootPath = __DIR__ . '/..';
 
 require $sRootPath . '/lib/class.XmlSorter.php';
 require $sRootPath . '/lib/class.Controller.php';
