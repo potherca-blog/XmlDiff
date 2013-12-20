@@ -1,5 +1,11 @@
 {
     "require" : {
         "phpspec/php-diff": "dev-master"
+    },
+    "require-dev" : {
+        "phpunit/phpunit": "*"
+    },
+    "autoload": {
+        "classmap": ["lib/"]
     }
 }

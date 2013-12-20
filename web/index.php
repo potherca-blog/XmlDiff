@@ -3,12 +3,7 @@ ob_start();
 
 $sRootPath = __DIR__ . '/..';
 
-require $sRootPath . '/lib/class.XmlSorter.php';
-require $sRootPath . '/lib/class.Controller.php';
-require $sRootPath . '/lib/class.Template.php';
-require $sRootPath . '/vendor/phpspec/php-diff/lib/Diff.php';
-require $sRootPath . '/vendor/phpspec/php-diff/lib/Diff/Renderer/Html/SideBySide.php';
-require $sRootPath . '/vendor/phpspec/php-diff/lib/Diff/Renderer/Html/Inline.php';
+require $sRootPath . '/vendor/autoload.php';
 
 $sDisplayMode = isset($_POST['display-mode']) && empty($_POST['display-mode']) === false
     ? $_POST['display-mode']
