@@ -105,6 +105,43 @@ namespace Test\Cases
         /**
          * @test
          */
+        public function sort_ReturnedDomNodesHaveOriginalContent_WhenGivenDomNodeWithUnsortedNodes()
+        {
+            $this->markTestSkipped('@TODO');
+        }
+        /**
+         * @test
+         */
+        public function sort_ReturnedNodesWithTheSameTagNameAreInOriginalOrder_WhenGivenDomNodesWithsTheSameTagName()
+        {
+            /** @var \DOMElement $oDomNode */
+            $oDocument = new \DOMDocument();
+            $oDocument->loadXML('
+                <Root>
+                    <Foo id="Bar" />
+                    <Foo id="Baz" />
+                    <Foo id="Foo" />
+                </Root>
+            ');
+
+            $oSortedDocument = \DomDocumentSorter::sort($oDocument);
+
+            $oChildNodes = $oSortedDocument->firstChild->childNodes;
+            $aActual = array();
+            foreach ($oChildNodes as $t_oChild) {
+                if ($t_oChild instanceof \DOMElement) {
+                    $aActual[] = $t_oChild->getAttribute('id');
+                }
+            }
+
+            $aExpected = array('Bar','Baz','Foo');
+
+            $this->assertSame($aExpected, $aActual);
+        }
+
+        /**
+         * @test
+         */
         public function sort_ReturnedSubNodesAreSorted_WhenGivenDomNodeWithUnsortedNodes()
         {
             /** @var \DOMElement $oDomNode */
@@ -165,26 +202,20 @@ namespace Test\Cases
             $oSortedDocument = \DomDocumentSorter::sort($oDocument);
 
             $sExpected = '<?xml version="1.0"?>
-            <Root>
-                <Bar>
-                    <A bar="one"/>
-                    <B foo="two" foz=""/>
-                </Bar>
-                <Foo>
-                    <C>
-                        Some content
-                    </C>
-                    <D bar="" foo="four">
-                        <Baz bar="Five" foo="">
-                            Some more content
-                        </Baz>
-                        <Boz bar="seven" foo="eight">
-                            Some more content
-                        </Boz>
-                    </D>
-                </Foo>
-            </Root>
-            ';
+<Root>
+  <Bar>
+    <A bar="one"/>
+    <B foo="two" foz=""/>
+  </Bar>
+  <Foo>
+    <C>Some content</C>
+    <D bar="" foo="four">
+      <Baz bar="Five" foo="">Some more content</Baz>
+      <Boz bar="seven" foo="eight">Some more content</Boz>
+    </D>
+  </Foo>
+</Root>
+';
 
             $sActual = $oSortedDocument->saveXML();
 

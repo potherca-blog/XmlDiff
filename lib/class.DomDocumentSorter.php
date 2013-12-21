@@ -9,100 +9,131 @@ class DomDocumentSorter
      */
     static public function sort(DOMDocument $p_oDocument)
     {
-        $oDocument = clone $p_oDocument;
-
         $oSorter = new self();
-        $oSorter->sortDomDocument($oDocument);
-
-        return $oDocument;
+        return $oSorter->sortDomDocument(clone $p_oDocument);
     }
 
     /**
-     * @param \DOMDocument $p_oDomDocument
+     * @param \DOMDocument $p_oSubjectDocument
+     *
+     * @return \DOMDocument
      */
-    public function sortDomDocument(DOMDocument $p_oDomDocument)
+    public function sortDomDocument(DOMDocument $p_oSubjectDocument)
     {
-        foreach ($p_oDomDocument->childNodes as $t_oDomElement) {
-            $this->sortDomElement($t_oDomElement, $p_oDomDocument);
-        }
+        $oTargetDocument = new DOMDocument('1.0');
+        $oTargetDocument->preserveWhiteSpace = false;
+        $oTargetDocument->formatOutput = true;
+
+        $oSubjectElement = $p_oSubjectDocument->documentElement;
+
+        $oTargetElement = $this->copyElement($oSubjectElement, $oTargetDocument);
+        $this->copyChildrenSorted($oSubjectElement, $oTargetElement);
+
+        $oTargetDocument->appendChild($oTargetElement);
+
+        // @FIXME: For some reason the $oTargetDocument output is not properly formatted.
+        //          The cause for this behaviour needs to be found so the hack below can be removed
+        $oPrettyDocument = new DOMDocument('1.0');
+        $oPrettyDocument->preserveWhiteSpace = false;
+        $oPrettyDocument->formatOutput = true;
+        $oPrettyDocument->loadXML($oTargetDocument->saveXML());
+
+        return $oPrettyDocument;
     }
 
     /**
      * Replace childNodes by sorted childNodes
      *
-     * @param DOMElement $p_oDomElement
-     * @param DOMDocument $p_oDocument
+     * @param DOMElement $p_oSubjectElement
+     * @param DOMElement $p_oTargetElement
+     *
+     * @return \DOMElement
      */
-    protected function sortDomElement(DOMElement $p_oDomElement)
+    protected function copyChildrenSorted(DOMElement $p_oSubjectElement, DOMElement $p_oTargetElement)
     {
-        $this->sortAttributes($p_oDomElement);
-
-        if ($p_oDomElement->hasChildNodes()) {
-            $oChildNodes = $p_oDomElement->childNodes;
+        if ($p_oSubjectElement->hasChildNodes()) {
             $aChildren = array();
-            foreach ($oChildNodes as $t_sIndex => $t_oDomElement) {
-                if ($t_oDomElement instanceof DOMText) {
-                    // Remove empty whitespace
-                    $sText = trim($t_oDomElement->textContent);
-                    if(empty($sText)){
-                        $p_oDomElement->removeChild($t_oDomElement);
+            foreach ($p_oSubjectElement->childNodes as $t_sIndex => $t_aElements) {
+                $oElementCopy = $this->copyElement($t_aElements, $p_oTargetElement->ownerDocument);
+                if ($t_aElements instanceof DOMText) {
+                    $sText = trim($t_aElements->textContent);
+                    if(! empty($sText)){
+                        $p_oTargetElement->appendChild($oElementCopy);
+                    } else {
+                        // Ignore empty whitespace
                     }
-                } else if($t_oDomElement instanceof DOMElement) {
-                    $aChildren[] = clone $t_oDomElement;
-                    $p_oDomElement->removeChild($t_oDomElement);
+                } else if($t_aElements instanceof DOMElement) {
+                    $aChildren[] = array('copy' => $oElementCopy, 'original' => $t_aElements);
                 } else {
-                    var_dump(get_class($t_oDomElement));
+                    // @CHECKME: What do we do with comments and others? Just clone everything over?
+                    $p_oTargetElement->appendChild($oElementCopy);
                 }
-                unset($t_oDomElement);
+                unset($t_aElements);
             }
 
-            // @FIXME: Things seem to go wrong round about here.
-            // Either the sorting is wrong or text-nodes muddle things up or the
-            // original nodes do not get properly removed and messes up things
-            // when replacement get appended.
-            $bSorted = usort($aChildren, function (DOMElement $p_oLeft, DOMElement $p_oRight) {
-                return strcasecmp($p_oRight->tagName, $p_oLeft->tagName);
+            $bSorted = usort($aChildren, function (array $p_aLeft, array $p_aRight) {
+                    if ($p_aLeft['original'] instanceof DOMElement && $p_aRight['original'] instanceof DOMElement) {
+                        return strcasecmp($p_aLeft['original']->tagName, $p_aRight['original']->tagName);
+                    } else {
+                        return 0;
+                    }
             });
 
-            /*
-             * We can just add the first child right away
-             * Every child after that we compare to that node
-             *
-             * If the child's tag name is alphabetically lower we move down
-             * the chain (if there are any next sibling) until we find a sibling
-             * who's name is lower than the current one
-             *
-             * The same logic applies up the chang for a higher sorting name
-             */
-
-            foreach ($aChildren as $t_oDomElement) {
-                $this->sortDomElement($t_oDomElement);
-                $p_oDomElement->appendChild(clone $t_oDomElement);
+            array_reverse($aChildren);
+            foreach ($aChildren as $t_aElements) {
+                $p_oTargetElement->appendChild($t_aElements['copy']);
+                $this->copyChildrenSorted($t_aElements['original'], $t_aElements['copy']);
             }
-
         }
     }
 
     /**
-     * replace attributes with sorted attributes
      * @param DOMElement $p_oDomNode
+     * @param DOMElement $p_oSubjectElement
      */
-    protected function sortAttributes(DOMElement $p_oDomNode)
+    protected function copyAttributesSorted(DOMElement $p_oDomNode,DOMElement $p_oSubjectElement)
     {
         $oDOMNamedNodeMap = $p_oDomNode->attributes;
         if( $oDOMNamedNodeMap instanceof DOMNamedNodeMap){
-            /* Remove all attributes and place them back in order */
+            /* Get all attributes and place them back in order */
             $aAttributes = array();
             foreach ($oDOMNamedNodeMap as $t_sNodeName => $t_oAttribute) {
                 /** @var DOMAttr $t_oAttribute */
                 $aAttributes[$t_oAttribute->name] = $t_oAttribute->value;
-                $p_oDomNode->removeAttribute($t_sNodeName);
             }
 
             ksort($aAttributes);
             foreach ($aAttributes as $t_sAttributeName => $t_sNodeValue) {
-                $p_oDomNode->setAttribute($t_sAttributeName, $t_sNodeValue);
+                $p_oSubjectElement->setAttribute($t_sAttributeName, $t_sNodeValue);
             }
         }
+    }
+
+    /**
+     * @param DOMNode $p_oSubjectElement
+     * @param DOMDocument $p_oDocument
+     *
+     * @throws Exception
+     *
+     * @return DOMElement
+     */
+    protected function copyElement(DOMNode $p_oSubjectElement, DOMDocument $p_oDocument)
+    {
+        if ($p_oSubjectElement instanceof DOMElement) {
+            $oTargetElement = $p_oDocument->createElement(
+                $p_oSubjectElement->nodeName, null // Text value is copied over by cloning TextNodes
+            );
+            $this->copyAttributesSorted($p_oSubjectElement, $oTargetElement);
+        } else if ($p_oSubjectElement instanceof DOMText) {
+            $oTargetElement = $p_oDocument->createTextNode(trim($p_oSubjectElement->textContent));
+        } else {
+            throw new Exception(
+                  'Nodes of type "' . get_class($p_oSubjectElement) .'" are not yet supported. '
+                . 'Please contact the creator of the software and demand support for '
+                  . get_class($p_oSubjectElement)
+            );
+        }
+
+        return $oTargetElement;
     }
 }
