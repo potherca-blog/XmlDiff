@@ -1,6 +1,6 @@
 {
     "require" : {
-        "phpspec/php-diff": "dev-master"
+        "phalcongelist/php-diff": "^2.0.0"
     },
     "require-dev" : {
         "phpunit/phpunit": "*"
