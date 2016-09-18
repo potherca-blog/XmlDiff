@@ -1,12 +1,17 @@
 <?php
+
+use Phalcon\Diff;
+use Phalcon\Diff\Renderer\Html\SideBySide;
+use Phalcon\Diff\Renderer\Html\Inline;
+
 class Controller
 {
     protected $m_aErrors = array();
 
-    function getContent(array $p_aUploadedFiles, $p_sDisplayType)
+    function getContent(array $p_aUploadedFiles, array $p_aOptions)
     {
         $sContent = '';
-
+        
         $sValid = $this->validateFile($p_aUploadedFiles);
 
         if ($sValid === false) {
@@ -34,7 +39,7 @@ class Controller
                     . '</li></ul>'
                 ;
             } else {
-                $sContent = $this->getDiff($sLeftXml, $sRightXml, $p_sDisplayType);
+                $sContent = $this->getDiff($sLeftXml, $sRightXml, $p_aOptions);
             }
 
         }
@@ -100,13 +105,16 @@ class Controller
      * @return mixed|string
      * @throws InvalidARgumentException
      */
-    protected function getDiff($sLeftXml, $sRightXml, $p_sDisplayType)
+    protected function getDiff($sLeftXml, $sRightXml, $p_aOptions)
     {
         $aLeft = explode("\n", $sLeftXml);
         $aRight = explode("\n", $sRightXml);
 
+        $sDisplayType = $p_aOptions['DisplayMode'];
+        $iContext = $p_aOptions['Context'];
+
         $aOptions = array(
-            //'context' => 999,
+            'context' => $iContext,
             'ignoreNewLines' => true,
             'ignoreWhitespace' => true,
             'ignoreCase' => true
@@ -116,12 +124,12 @@ class Controller
         $oDiff = new Diff($aLeft, $aRight, $aOptions);
 
         // Generate a side by side diff
-        if ($p_sDisplayType === 'side-by-side') {
-            $oRenderer = new Diff_Renderer_Html_SideBySide;
-        } elseif ($p_sDisplayType === 'inline') {
-            $oRenderer = new Diff_Renderer_Html_Inline;
+        if ($sDisplayType === 'side-by-side') {
+            $oRenderer = new SideBySide();
+        } elseif ($sDisplayType === 'inline') {
+            $oRenderer = new Inline();
         } else {
-            throw new InvalidARgumentException('Unknow display type "' . $p_sDisplayType . '"');
+            throw new InvalidArgumentException('Unknow display type "' . $sDisplayType . '"');
         }
 
         $sContent = $oDiff->render($oRenderer);

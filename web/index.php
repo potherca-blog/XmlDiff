@@ -5,15 +5,21 @@ $sRootPath = __DIR__ . '/..';
 
 require $sRootPath . '/vendor/autoload.php';
 
-$sDisplayMode = isset($_POST['display-mode']) && empty($_POST['display-mode']) === false
-    ? $_POST['display-mode']
-    :'side-by-side'
-;
+$sDisplayMode = 'side-by-side';
+$iContext = 3;
+
+if (isset($_POST['display-mode']) && empty($_POST['display-mode']) === false) {
+    $sDisplayMode = $_POST['display-mode'];
+}
+
+if (isset($_POST['context'])) {
+    $iContext = (int) $_POST['context'];
+}
 
 
 try {
     $oController = new Controller();
-    $sContent = $oController->getContent($_FILES, $sDisplayMode);
+    $sContent = $oController->getContent($_FILES, ['DisplayMode' => $sDisplayMode, 'Context' => $iContext]);
 
     $oTemplate = Template::fromFile('template.index.html');
 

@@ -3,6 +3,9 @@
 <head>
     <title>Compare two XML files</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://pother.ca/CssBase/css/created-by-potherca.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.2.3/foundation.min.css"/>
+
     <style>
         .match, .warning {
             border: 1px solid;
@@ -26,36 +29,82 @@
             background-color: darkgreen;
             color: white;
         }
+
+        body {
+            background-color: #ECFAFF;
+        }
+
+
+        .main-container{
+            width: 50%;
+            min-width: 60em;
+            margin: 0 auto;
+        }
+
+        .header, fieldset {
+            background-color: #FFF;
+        }
     </style>
 </head>
 <body>
 <!-- -->
-<form action="" method="post" enctype="multipart/form-data">
-    <p>XML Files to compare:</p>
-    <p>
-        <label>
-            Old:
-            <input name="left" type="file" />
-        </label>
-        <label>
-            New:
-            <input name="right" type="file" />
-        </label>
-    </p>
-    <p>
-        Display Diff
-        <label>
-            <input type="radio" name="display-mode" value="side-by-side" /> Side-by-side
-        </label>
-        <label>
-            <input type="radio" name="display-mode" value="inline" /> Inline
-        </label>
-    </p>
-    <p>
-        <input type="submit" value="Send files" />
-    </p>
-</form>
+    <div class="header text-center">
+        <h1>
+            <a href="./">XML Diff</a><br/>
+            <small>Shows the difference between two XML files.</small>
+        </h1>
+
+        <p class="callout primary radius">
+            This web application will tell you the difference between two given XML files, 
+            regardless of node order. It also takes node attributes into account.
+        </p>
+    </div>
 <!-- -->
-<div id="content"></div>
+    <div id="content"></div>
+<!-- -->
+    <div class="main-container text-center">
+        <form accept-charset="utf-8" action="" enctype="multipart/form-data" method="post" spellcheck="false">
+
+            <fieldset class="fieldset">
+                <legend>XML Files to compare:</legend>
+
+                <label for="file-nr-1" class="button hollow">XML File  Nr.1</label>
+                <input type="file" name="left" id="file-nr-1" class="show-for-sr" />
+
+                <label for="file-nr-2" class="button hollow">XML File Nr.2</label>
+                <input type="file" name="right" id="file-nr-2" class="show-for-sr" />
+            </fieldset>
+
+            <fieldset class="fieldset">
+                <legend>Display Diff:</legend>
+
+                <input type="radio" id="display-diff-A" name="display-mode" value="side-by-side" />
+                <label for="display-diff-A">Side-by-side</label>
+
+                <input type="radio"  id="display-diff-B" name="display-mode" value="inline" />
+                <label for="display-diff-A">Inline</label>
+            </fieldset>
+
+            <fieldset class="fieldset">
+                <legend>Lines Around Diff</legend>
+                <label>
+                    <input class="text-center" type="number" name="context" min="0" step="1" placeholder="3"/>
+                </label>
+            </fieldset>
+
+            <button type="submit" class="button">Send files</button>
+        </form>
+    </div>
+<!-- -->
+    <div class="footer text-right">
+        <span class="version">0.2.0</span>
+        &ndash;
+        The Source Code for this project is <a href="https://github.com/potherca/xmldiff">available on github.com</a> under a <a href="https://www.gnu.org/licenses/gpl.html" rel="license">GPLv3 License</a>
+        &ndash;
+        <a href="http://pother.ca/" class="created-by">Created by <span class="potherca">Potherca</span></a>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.2.3/foundation.min.js"></script>
 </body>
 </html>
