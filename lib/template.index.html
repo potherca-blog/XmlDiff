@@ -7,20 +7,25 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.2.3/foundation.min.css"/>
 
     <style>
-        .match, .warning {
+        .match, .error-warning {
             border: 1px solid;
             padding: 0.35em;
             border-radius: 0.15em;
         }
-        .warning {
+
+        .error-warning {
             border-color: red;
             color: darkred;
+            width: 50%;
+            min-width: 60em;
+            margin: 0 auto;
+            background-color: #FFF;
         }
-        .warning::before {
+        .error-warning::before {
             content: "WARNING: ";
             background-color: darkred;
             color: white;
-            padding: 0.35em;
+            padding: 0.5em;
             left: -0.5em;
             position: relative;
         }
@@ -44,6 +49,27 @@
         .header, fieldset {
             background-color: #FFF;
         }
+
+
+        .switch.round .switch-paddle,
+        .switch.round .switch-paddle::after {
+            border-radius: 2rem;
+        }
+
+        .diff-options .columns .text-right {
+            line-height: 2.5;
+        }
+        .diff-options .row {
+            height: 3rem;
+        }
+        .diff-options .columns {
+            height: 3rem;
+        }
+
+        .change-count {
+            margin: 0;
+            padding: 0.25em;
+        }
     </style>
 </head>
 <body>
@@ -55,17 +81,17 @@
         </h1>
 
         <p class="callout primary radius">
-            This web application will tell you the difference between two given XML files, 
+            This web application will tell you the difference between two given XML files,
             regardless of node order. It also takes node attributes into account.
         </p>
     </div>
 <!-- -->
     <div id="content"></div>
 <!-- -->
-    <div class="main-container text-center">
+    <div class="main-container">
         <form accept-charset="utf-8" action="" enctype="multipart/form-data" method="post" spellcheck="false">
 
-            <fieldset class="fieldset">
+            <fieldset class="fieldset text-center">
                 <legend>XML Files to compare:</legend>
 
                 <label for="file-nr-1" class="button hollow">XML File  Nr.1</label>
@@ -75,24 +101,86 @@
                 <input type="file" name="right" id="file-nr-2" class="show-for-sr" />
             </fieldset>
 
-            <fieldset class="fieldset">
-                <legend>Display Diff:</legend>
+            <fieldset class="diff-options fieldset">
+                <div class="row">
+                    <div class="small-3 columns">
+                        <label class="text-right">Display Side-by-Side</label>
+                    </div>
 
-                <input type="radio" id="display-diff-A" name="display-mode" value="side-by-side" />
-                <label for="display-diff-A">Side-by-side</label>
+                    <div class="small-9 columns">
+                        <div class="switch large round">
+                            <input
+                                checked
+                                class="switch-input"
+                                id="side-by-side"
+                                name="side-by-side"
+                                type="checkbox"
+                            />
+                            <label class="switch-paddle" for="side-by-side">
+                                <span class="show-for-sr">Side by Side?</span>
+                                <span class="switch-active" aria-hidden="true">Yes</span>
+                                <span class="switch-inactive" aria-hidden="true">No</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
 
-                <input type="radio"  id="display-diff-B" name="display-mode" value="inline" />
-                <label for="display-diff-A">Inline</label>
+                <div class="row">
+                    <div class="small-3 columns">
+                        <label class="text-right">Lines Around Diff</label>
+                    </div>
+                    <div class="small-2 columns float-left">
+                        <input
+                            class="text-center"
+                            min="0"
+                            name="context"
+                            placeholder="3"
+                            step="1"
+                            type="number"
+                        />
+                    </div>
+                </div>
+<!-- @TODO: Add option for tabSize
+                <div class="row">
+                    <div class="small-3 columns">
+                        <label class="text-right">Tab Size</label>
+                    </div>
+                    <div class="small-2 columns float-left">
+                        <input
+                            class="text-center"
+                            min="0"
+                            name="tab-size"
+                            placeholder="4"
+                            step="1"
+                            type="number"
+                        />
+                    </div>
+                </div>
+-->
+                <div class="row">
+                    <div class="small-3 columns">
+                        <label class="text-right">Case Sensitive</label>
+                    </div>
+                    <div class="small-9 columns">
+                        <div class="switch large round">
+                            <input
+                                class="switch-input"
+                                id="case-sensitive"
+                                name="case-sensitive"
+                                type="checkbox"
+                            />
+                            <label class="switch-paddle" for="case-sensitive">
+                                <span class="show-for-sr">Case Sensitive?</span>
+                                <span class="switch-active" aria-hidden="true">Yes</span>
+                                <span class="switch-inactive" aria-hidden="true">No</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
             </fieldset>
 
-            <fieldset class="fieldset">
-                <legend>Lines Around Diff</legend>
-                <label>
-                    <input class="text-center" type="number" name="context" min="0" step="1" placeholder="3"/>
-                </label>
-            </fieldset>
-
-            <button type="submit" class="button">Send files</button>
+            <button type="submit" class="button">Compare Files</button>
         </form>
     </div>
 <!-- -->
