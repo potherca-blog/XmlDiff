@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "9987410b2565dc8a67c1447b3c4af34b",
-    "content-hash": "6f3541a061300ba48d4b50ff8711efe1",
+    "hash": "a1a64376b9aea41e050ecb20edd033f9",
+    "content-hash": "eb99fe7aee81015d7d15ff36439f127b",
     "packages": [
         {
             "name": "phalcongelist/php-diff",
@@ -1168,6 +1168,8 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "ext-mbstring": "*"
+    },
     "platform-dev": []
 }

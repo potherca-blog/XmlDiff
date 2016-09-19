@@ -1,5 +1,6 @@
 {
     "require" : {
+        "ext-mbstring": "*",
         "phalcongelist/php-diff": "^2.0.0"
     },
     "require-dev" : {
