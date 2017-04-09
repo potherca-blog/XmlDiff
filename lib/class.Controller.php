@@ -1,9 +1,16 @@
 <?php
+
+use Phalcon\Diff;
+use Phalcon\Diff\Renderer\Html\BaseArray;
+use Phalcon\Diff\Renderer\Html\Inline;
+use Phalcon\Diff\Renderer\Html\SideBySide;
+use Phalcon\Diff\Renderer\RenderInterface;
+
 class Controller
 {
     protected $m_aErrors = array();
 
-    function getContent(array $p_aUploadedFiles, $p_sDisplayType)
+    function getContent(array $p_aUploadedFiles, array $p_aOptions)
     {
         $sContent = '';
 
@@ -13,7 +20,7 @@ class Controller
             // Nothing to do
             $sContent = '';//<p class="match">Files are identical</p>';
         } else if (is_string($sValid)) {
-            $sContent = '<p class="warning">' . $sValid . '</p>';
+            $sContent = '<p class="error-warning">' . $sValid . '</p>';
         } else if ($sValid === true) {
             $oLeftXml = XmlSorter::forFile($p_aUploadedFiles['left']['tmp_name']);
             $sLeftXml = $oLeftXml->sortXml();
@@ -28,15 +35,31 @@ class Controller
             }
 
             if (empty($this->m_aErrors) === false) {
-                $sContent = '<p class="warning">Invalid XML Content</p>'
+                $sContent = '<p class="error-warning">Invalid XML Content</p>'
                     . '<ul><li>'
                     . implode('</li><li>', $this->m_aErrors)
                     . '</li></ul>'
                 ;
             } else {
-                $sContent = $this->getDiff($sLeftXml, $sRightXml, $p_sDisplayType);
-            }
+                $sDisplayType = $p_aOptions['DisplayMode'];
+                $iContext = $p_aOptions['Context'];
+                $bIgnoreCase = $p_aOptions['IgnoreCase'];
 
+                $aOptions = array(
+                    'context' => $iContext,
+                    'ignoreCase' => $bIgnoreCase,
+                    'ignoreNewLines' => true,
+                    'ignoreWhitespace' => true,
+                );
+
+                $oDiff = $this->createDiff($sLeftXml, $sRightXml, $aOptions);
+                $oHtmlRenderer = $this->createRenderer($sDisplayType);
+                $oBaseArray = new BaseArray();
+
+                $sContent = '';
+                $sContent .= $this->getContentFromBaseArray($oDiff, $oBaseArray);
+                $sContent .= $this->getContentFromRenderer($oDiff, $oHtmlRenderer);
+            }
         }
 
         return $sContent;
@@ -98,33 +121,71 @@ class Controller
      * @param $p_sDisplayType
      *
      * @return mixed|string
-     * @throws InvalidARgumentException
+     * @throws InvalidArgumentException
      */
-    protected function getDiff($sLeftXml, $sRightXml, $p_sDisplayType)
+    private function createDiff($p_sLeftXml, $p_sRightXml, $p_aOptions)
     {
-        $aLeft = explode("\n", $sLeftXml);
-        $aRight = explode("\n", $sRightXml);
+        $aLeft = explode("\n", $p_sLeftXml);
+        $aRight = explode("\n", $p_sRightXml);
 
-        $aOptions = array(
-            //'context' => 999,
-            'ignoreNewLines' => true,
-            'ignoreWhitespace' => true,
-            'ignoreCase' => true
-        );
+        return new Diff($aLeft, $aRight, $p_aOptions);
+    }
 
-        // Initialize the diff class
-        $oDiff = new Diff($aLeft, $aRight, $aOptions);
-
+    private function createRenderer ($p_sDisplayType)
+    {
         // Generate a side by side diff
         if ($p_sDisplayType === 'side-by-side') {
-            $oRenderer = new Diff_Renderer_Html_SideBySide;
+            $oRenderer = new SideBySide();
         } elseif ($p_sDisplayType === 'inline') {
-            $oRenderer = new Diff_Renderer_Html_Inline;
+            $oRenderer = new Inline();
         } else {
-            throw new InvalidARgumentException('Unknow display type "' . $p_sDisplayType . '"');
+            throw new InvalidArgumentException('Unknow display type "' . $p_sDisplayType . '"');
         }
 
-        $sContent = $oDiff->render($oRenderer);
+        return $oRenderer;
+    }
+
+    protected function getContentFromBaseArray(Diff $p_oDiff, BaseArray $p_oBaseArray)
+    {
+        $aChanges = $p_oDiff->render($p_oBaseArray);
+
+        $aChangeCount = [
+            'delete' => 0,
+            'insert' => 0,
+            'replace' => 0,
+        ];
+
+        foreach($aChanges[0] as $aChange){
+            $sChangeType = $aChange['tag'];
+            if ($sChangeType !== 'equal') {
+                $aChangeCount[$sChangeType]++;
+            }
+        }
+
+        $sTemplate = <<<HTML
+            <div class="change-count callout text-center">
+                <span class="label"><span class="secondary badge">%s</span> Total Differences</span>
+                <span class="secondary label"><span class="success badge">%s</span> Additions</span>
+                <span class="secondary label"><span class="warning badge">%s</span> Changes</span>
+                <span class="secondary label"><span class="alert badge">%s</span> Deletes</span>
+            </div>
+HTML;
+
+        $sContent = sprintf(
+            $sTemplate,
+            array_sum($aChangeCount),
+            $aChangeCount['insert'],
+            $aChangeCount['replace'],
+            $aChangeCount['delete']
+        );
+
+        return $sContent;
+    }
+
+    protected function getContentFromRenderer(Diff $p_oDiff, RenderInterface $p_oRenderer)
+    {
+        $sContent = $p_oDiff->render($p_oRenderer);
+
         if ($sContent === '') {
             $sContent = '<p class="match">Files are identical</p>';
 
